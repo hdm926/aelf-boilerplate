@@ -63,7 +63,7 @@ function initDomEvent(multiTokenContract, bingoGameContract) {
       })
       .catch(err => {
         console.log(err);
-      });;
+      });
   }
 
   refreshButton.onclick = () => {
@@ -79,18 +79,16 @@ function initDomEvent(multiTokenContract, bingoGameContract) {
     loading = true;
     loader.style.display = 'inline-block';
     bingoGameContract.Register()
-      .then(() => {
-        return new Promise(resolve => {
-          register.innerText = 'Loading';
-          setTimeout(() => {
-            getBalance();
-            loading = false;
-            register.innerText = 'Register';
-            loader.style.display = 'none';
-            resolve()
-          }, 3000);
-        });
-      })
+      .then(() => new Promise(resolve => {
+        register.innerText = 'Loading';
+        setTimeout(() => {
+          getBalance();
+          loading = false;
+          register.innerText = 'Register';
+          loader.style.display = 'none';
+          resolve();
+        }, 3000);
+      }))
       .then(() => {
         alert('Congratulations on your successful registration！');
         siteBody.style.display = 'block';

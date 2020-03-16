@@ -123,6 +123,7 @@ aelf.chain.getChainStatus().then(async result => {
       if (!wallet) {
         alert('please click login at first');
         return;
+
       }
 
       aelf.chain.contractAt(
