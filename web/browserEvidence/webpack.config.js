@@ -1,17 +1,13 @@
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const path = require('path');
 module.exports = {
+    entry: './src/index.js',
     mode: 'development',
-    devtool: 'source-map',
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'evidence.bundle.js'
     },
-    resolve: {
-        alias: {
-            'aelf-sdk$': 'aelf-sdk/dist/aelf.umd.js'
-        }
-    },
+    devtool: 'source-map',
     devServer: {
         contentBase: path.join(__dirname, './public/'),
         publicPath: '/',
@@ -21,8 +17,12 @@ module.exports = {
             colors: true
         }
     },
+    resolve: {
+        alias: {
+            'aelf-sdk$': 'aelf-sdk/dist/aelf.umd.js'
+        }
+    },
 
-    entry: './src/index.js',
     resolve: {
         extensions: ['.wasm', '.mjs', '.js', '.json', '.jsx']
     },
