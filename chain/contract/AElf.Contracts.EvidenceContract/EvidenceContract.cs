@@ -1,91 +1,69 @@
 ﻿using System;
 using System.IO;
-using System.Net.Http;
+using System.Linq;
 using AElf.Types;
 using Google.Protobuf;
 using Google.Protobuf.Collections;
 using Google.Protobuf.WellKnownTypes;
-using Microsoft.Extensions.DependencyInjection;
-using Volo.Abp;
+using Org.BouncyCastle.Crypto.Tls;
 
 namespace AElf.Contracts.EvidenceContract
 {
     public class EvidenceContract : EvidenceContractContainer.EvidenceContractBase
     {
-        public override VerifyAnswer VerifyFiles(Hash input)
+        public override VerifyAnswer VerifyFiles(Hash id)
         {
-            StringValue filePath = new StringValue();
-            var fP = "D:\\evidence\\" + input.ToString();
-            
-            Assert(!File.Exists(fP),"Wrong input!");
-            filePath.Value = fP;
-            
-            Hash hash = FilesToHash(filePath);
+            var fileReceived = State.FileReceived[id];//得到原始文件
 
-            Assert(hash!=input,"This file has been changed!");
-            
-            var verifyAnswer = State.VerifyAnswer[input];
-            verifyAnswer.IsSame = true;
-                
-            byte[] bytes = FileToBytes(filePath.Value);
-            verifyAnswer.Value = bytes.ToString();
-            
-            return State.VerifyAnswer[input];
+            var fileName = fileReceived.FileName;//得到原始文件的文件名
+            //读取服务器文件
+            var filePath = "D://evidence//" + fileName;
+            FileStream fs = new FileStream(filePath,FileMode.Open);
+
+            long size = fs.Length;
+            byte[] fileByte = new byte[size];
+
+            fs.Read(fileByte, 0, fileByte.Length);
+            fs.Close();
+            //进行哈希计算
+            Hash hashCode = Hash.FromByteArray(fileByte);
+            //比较哈希码
+            if (hashCode == id)
+            {
+                var verifyAnswer = State.VerifyAnswer[id];
+                verifyAnswer.IsSame = true;
+                verifyAnswer.FileAnswer = ByteString.CopyFrom(fileByte);
+                return State.VerifyAnswer[id];
+            }
+
+            return null;
         }
-        
-        public override Hash FilesToHash(StringValue input)
+
+        public override Empty FilesToHash(FileReceived input)
         {
-            string fileUrl = input.Value;
-            Assert(!File.Exists(fileUrl),"Wrong file path!");
-            //文件转成字节流
-            byte[] fileBytes = FileToBytes(fileUrl);
-            
-            //从文件绝对路径中提取文件扩展名
-            string[] fu = fileUrl.Split('.');
-            string extension = fu[fu.Length - 1];
-            
-            Hash id = Hash.FromByteArray(fileBytes);
+            //fileReceived: id,fileName,fileBytes,fileSize,saveTime
+            Hash id = input.Id;
             var fileReveived = State.FileReceived[id];
-            
-            fileReveived.FileName = fileReveived.Id.ToString() + '.' + extension;
-            fileReveived.FilePath = "D://evidence//" + fileReveived.FileName;
-            fileReveived.FileSize = fileBytes.Length;
+
+            fileReveived.FileName = input.FileName;
+            fileReveived.FileSize = input.FileSize;
             fileReveived.SaveTime = Timestamp.FromDateTime(DateTime.Now);
-            
-            BytesToFile(fileBytes , fileReveived.FilePath);
-            
-            return Hash.FromByteArray(fileBytes);
+
+            //byte数组写入文件
+            var filePath = "D:\\evidence";
+            BytesToFile(input.FileByte.ToByteArray(), filePath, fileReveived.FileName);
+
+            return new Empty();
         }
 
-        public byte[] FileToBytes(string fileUrl)
+        private void BytesToFile(byte[] fileBytes, string filePath, string fileName)
         {
-            byte[] fileBytes = null;
-            if (File.Exists(fileUrl))
-            {
-                FileStream fileStream = null;
-                try
-                {
-                    fileStream = File.OpenRead(fileUrl);
-                    fileBytes = fileStream.GetAllBytes();
-                }
-                catch
-                {
-                    return null;
-                }
-                finally
-                {
-                    fileStream.Close();
-                }
-            }
-            return fileBytes;
+            string path = filePath + fileName;
+            FileStream fs = new FileStream(path, FileMode.Create);
+
+            fs.Write(fileBytes, 0, fileBytes.Length);
+            fs.Close();
         }
 
-        public void BytesToFile(byte[] fileBytes, string filePath)
-        {
-            using (FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Write))
-            {
-                fs.Write(fileBytes, 0, fileBytes.Length);
-            }
-        }
     }
 }
