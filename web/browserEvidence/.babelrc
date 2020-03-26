@@ -1,0 +1,13 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      "react",
+      "react-dom"
+    ]
+  ],
+  "plugins": [
+    "@babel/plugin-transform-runtime",
+    "syntax-dynamic-import"
+  ]
+}
