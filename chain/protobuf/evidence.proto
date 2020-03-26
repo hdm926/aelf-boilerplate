@@ -5,6 +5,7 @@ import "aelf/core.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
+import "google/protobuf/type.proto";
 
 option csharp_namespace = "AElf.Contracts.EvidenceContract";
 
@@ -12,27 +13,20 @@ service EvidenceContract {
     option (aelf.csharp_state) = "AElf.Contracts.EvidenceContract.EvidenceContractState";
 
     // Actions
-    rpc FilesToHash (google.protobuf.StringValue) returns (aelf.Hash) { }
+    rpc FilesToHash (FileReceived) returns (google.protobuf.Empty) { }
     rpc VerifyFiles (aelf.Hash) returns (VerifyAnswer) { }
     
 }
 
 message FileReceived{
     aelf.Hash id = 1;
-    sint32 fileType = 2;// words : 0; picture : 1; audio : 2; video : 3;
-    string fileName = 3;
+    string fileName = 2;
+    bytes fileByte = 3;
     sint32 fileSize = 4;
     google.protobuf.Timestamp saveTime = 5;
-    repeated bytes fileByte = 6;
-    string filePath = 7;//the path in servers
-}
-
-message FilesReceived{
-    aelf.Hash id = 1;
-    repeated FileReceived received = 2;
 }
 
 message VerifyAnswer{
-    string value= 1;
+    bytes fileAnswer= 1;
     bool IsSame = 2;
 }
