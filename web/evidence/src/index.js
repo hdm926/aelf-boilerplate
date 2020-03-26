@@ -2,61 +2,85 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import 'antd/dist/antd.css';
 import React, { Component } from 'react';
-import $ from 'jquery';
 import { Input, Form, message, Button } from 'antd';
 import 'antd/dist/antd.css';
+import reqwest from 'reqwest';
 import AElf from 'aelf-sdk';
 
+const aelf = new AElf(new AElf.providers.HttpProvider('http://127.0.0.1:3000'));
+const newWallet = AElf.wallet.createNewWallet();
 const evidenceContractName = 'AElf.ContractNames.EvidenceContract';
-const aelf = new AElf(new AElf.providers.HttpProvider('http://127.0.0.1:1235'));
 
-function inputFile(props) {
-  let file = document.querySelector('#input').files[0];
-  if(file){
-    var reader = new FileReader();
-    // 图片文件转换为base64
-    reader.readAsDataURL(file);
-  }
-  this.setState({
-    file:file
-  })
-}
+let evidenceContractAddress;
+(async () => {
+  const chainStatus = await aelf.chain.getChainStatus();
+  const GenesisContractAddress = chainStatus.GenesisContractAddress;
+  const zeroContract = await aelf.chain.contractAt(GenesisContractAddress, newWallet);
+  evidenceContractAddress = await zeroContract.GetContractAddressByName.call(AElf.utils.sha256(evidenceContractName));
+})();
+
+const wallet = AElf.wallet.createNewWallet();
+let evidenceContract;
+(async () => {
+  evidenceContract = await aelf.chain.contractAt(evidenceContractAddress, wallet)
+})();
+
+aelf.chain.contractAt(evidenceContractAddress, wallet)
+  .then(result => {
+    evidenceContract = result;
+  });
+
+aelf.chain.contractAt(evidenceContractAddress, wallet, (error, result) => {if (error) throw error; evidenceContract = result;});
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state ={
-      fileList:[],
-      file:{},
-      imageUrl:'',
-      input:{},
-      resdata:"",
-      uploading: false
+    this.state = {
+      fileReceived : [],
+      fileName : '',
     }
+    this.inputFile = this.inputFile.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleSubmit(props) {
-    let file = this.props.file;
-    let formData = new FormData();
-    let temp = file.files[0];
-    if (temp){
-      formData.append('file',temp);
-      file.src = window.URL.createObjectURL(temp);
-      $.ajax({
-        url:"/test/fileUpLoad",//后端接口
-        type:"POST",
-        data: formData,
-        processData: false, // 告诉jQuery不要去处理发送的数据
-        contentType: false, // 告诉jQuery不要去设置Content-Type请求头
-        success: function(result){
-          alert(result);
-        }
-      })
+  inputFile(){
+    const fileReceived = document.querySelector('#input').files[0];
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(fileReceived);
+
+    reader.onload = function () {
+      console.log(fileReceived.name);
+      console.log(this.result);
+      console.log(new Blob([this.result]))
     }
-    //alert('call succeed')
+    this.setState({
+      fileReceived : this.result,
+      fileName : fileReceived.name,});
+  }
+
+  handleSubmit() {
+    const fileReceived = this.state.fileReceived;
+    const hashCode = AElf.utils.sha256(fileReceived);
+    (async () => {
+      const result = await evidenceContract.FilesToHash.call({
+        id: hashCode,
+        fileName: this.state.filename,
+        fileByte: fileReceived,
+        fileSize: fileReceived.length,
+        saveTime: new Date(),
+      });
+    })();
+    return (
+      <h1>hashCode</h1>
+    );
   }
 
   render() {
+    // if(!aelf.isConnected()) {
+    //   alert('Blockchain Node is not running.');
+    //   process.exit(1);
+    // }
+
     return (
       <div className="homepage">
         <Form
@@ -72,10 +96,10 @@ class App extends Component {
           </div>
           <div id="input_div">
             选择文件
-            <Input type="file" id="input" name="file" onChange={this.inputFile}/>
+            {<Input type="file" id="input" onChange={this.inputFile}/>}
           </div>
           <div>
-            <button onClick={()=>this.handleSubmit(this.props)}>提交</button>
+            <button onClick={()=>this.handleSubmit()}>提交</button>
           </div>
         </Form>
       </div>
@@ -83,8 +107,6 @@ class App extends Component {
   }
 }
 
-
-//注意，Input中的name代表的是传给后台的参数 enctype="multipart/form-data"是前后台约定的类型
 ReactDOM.render(
   <App />,
   document.getElementById('root')
