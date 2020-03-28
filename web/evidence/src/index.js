@@ -7,7 +7,7 @@ import 'antd/dist/antd.css';
 import reqwest from 'reqwest';
 import AElf from 'aelf-sdk';
 
-const aelf = new AElf(new AElf.providers.HttpProvider('http://127.0.0.1:3000'));
+const aelf = new AElf(new AElf.providers.HttpProvider('http://127.0.0.1:1235'));
 const newWallet = AElf.wallet.createNewWallet();
 const evidenceContractName = 'AElf.ContractNames.EvidenceContract';
 
@@ -38,6 +38,7 @@ class App extends Component {
     this.state = {
       fileReceived : [],
       fileName : '',
+      hashCode : '',
     }
     this.inputFile = this.inputFile.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -58,6 +59,15 @@ class App extends Component {
       fileName : fileReceived.name,});
   }
 
+  inputHashCode(){
+    const code = document.querySelector('#hashCode');
+    this.setState({
+      hashCode : code,
+    })
+  }
+
+
+
   handleSubmit() {
     const fileReceived = this.state.fileReceived;
     const hashCode = AElf.utils.sha256(fileReceived);
@@ -73,6 +83,15 @@ class App extends Component {
     return (
       <h1>hashCode</h1>
     );
+  }
+
+  handleHashCode(){
+    const code = this.state.hashCode;
+    (async () => {
+      const result = await evidenceContract.VerifyAnwser.call({
+        id: code,
+      });
+    })();
   }
 
   render() {
@@ -96,7 +115,11 @@ class App extends Component {
           </div>
           <div id="input_div">
             选择文件
-            {<Input type="file" id="input" onChange={this.inputFile}/>}
+            <Input type="file" id="input" onChange={this.inputFile()}/>
+          </div>
+          <div id = 'verify'>
+            <Input type = "textarea" id = "hashCode" onChane={this.inputHashCode()}/>
+            <button onClick={()=>this.handleHashCode()}>验证</button>
           </div>
           <div>
             <button onClick={()=>this.handleSubmit()}>提交</button>
