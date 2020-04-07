@@ -14,7 +14,7 @@ service EvidenceContract {
 
     // Actions
     rpc FilesToHash (FileReceived) returns (google.protobuf.Empty) { }
-    rpc VerifyFiles (aelf.Hash) returns (VerifyAnswer) { }
+    rpc VerifyFiles (aelf.Hash) returns (bytes) { }
     
 }
 
@@ -24,9 +24,4 @@ message FileReceived{
     bytes fileByte = 3;
     sint32 fileSize = 4;
     google.protobuf.Timestamp saveTime = 5;
-}
-
-message VerifyAnswer{
-    bytes fileAnswer= 1;
-    bool IsSame = 2;
 }

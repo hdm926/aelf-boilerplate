@@ -6,6 +6,5 @@ namespace AElf.Contracts.EvidenceContract
     public class EvidenceContractState : ContractState
     {
         public MappedState<Hash, FileReceived> FileReceived { get; set; }
-        public MappedState<Hash, VerifyAnswer> VerifyAnswer { get; set; }
     }
 }
