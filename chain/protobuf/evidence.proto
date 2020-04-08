@@ -5,7 +5,7 @@ import "aelf/core.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
-import "google/protobuf/type.proto";
+
 
 option csharp_namespace = "AElf.Contracts.EvidenceContract";
 
@@ -14,14 +14,17 @@ service EvidenceContract {
 
     // Actions
     rpc FilesToHash (FileReceived) returns (google.protobuf.Empty) { }
-    rpc VerifyFiles (aelf.Hash) returns (bytes) { }
+    // Views
+    rpc VerifyFiles (aelf.Hash) returns (google.protobuf.BytesValue) {
+        option (aelf.is_view) = true;
+    }
     
 }
 
 message FileReceived{
     aelf.Hash id = 1;
     string fileName = 2;
-    bytes fileByte = 3;
+    bytes fileByte = 3;//对应c++中的string,java中的ByteString
     sint32 fileSize = 4;
     google.protobuf.Timestamp saveTime = 5;
 }

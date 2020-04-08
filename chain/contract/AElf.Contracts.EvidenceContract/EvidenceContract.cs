@@ -1,33 +1,28 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using AElf.Types;
 using Google.Protobuf;
-using Google.Protobuf.Collections;
 using Google.Protobuf.WellKnownTypes;
-using Org.BouncyCastle.Crypto.Tls;
 
 namespace AElf.Contracts.EvidenceContract
 {
     public class EvidenceContract : EvidenceContractContainer.EvidenceContractBase
     {
-        public override byte[] VerifyFiles(Hash id)
+        public override BytesValue VerifyFiles(Hash id)
         {
             var fileReceived = State.FileReceived[id]; //得到原始文件
 
-            byte[] fileByte = null;
-
             if (fileReceived == null)
             {
-                return fileByte;
+                return null;
             }
 
-            fileByte = fileReceived.FileByte;
-            Hash hashCode = Hash.FromByteArray(fileByte);
+            var fileByte = fileReceived.FileByte;
+            Hash hashCode = Hash.FromByteArray(fileByte.ToByteArray());
             //比较哈希码
             if (hashCode == id)
             {
-                return fileByte;
+                return new BytesValue {Value = fileByte};
             }
 
             return null;
