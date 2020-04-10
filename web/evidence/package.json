@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "aelf-sdk": "^3.2.30",
+    "aelf-sdk": "^3.2.32",
     "antd": "^4.0.4",
     "react-dom": "^16.13.1",
     "react-scripts": "^3.4.1",
