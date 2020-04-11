@@ -40,7 +40,7 @@ class App extends Component {
     this.handleHashCode = this.handleHashCode.bind(this);
   }
 
-  //修改state
+  //选择上传的文件
   inputFile(){
     const fileReceived = document.querySelector('#input').files[0];
     const reader = new FileReader();
@@ -49,26 +49,18 @@ class App extends Component {
     reader.onload = function () {
       console.log(fileReceived.name);//文件名
       console.log(this.result);
-
       that.setState({
         fileReceived : this.result,
         fileName : fileReceived.name,});
     }
   }
 
-  inputHashCode(){
-   /* const code = document.querySelector('#hashCode');
-    this.setState({
-      hashCode : code,
-    })*/
-  }
-
+  //提交选择的文件
   handleSubmit() {
     const fileBytes = this.state.fileReceived;
-    //const hashCode = AElf.utils.sha256(fileBytesToString);
+    const hashCode = AElf.utils.sha256(fileBytes);
     console.log(this.state.fileReceived);
-    console.log("hello submit")
-    //console.log(hashCode);
+    console.log("hash:"+hashCode);
     /*(async () => {
         await evidenceContract.FilesToHash.call({
         id: hashCode,
@@ -84,8 +76,12 @@ class App extends Component {
 
   }
 
+  //取得输入的哈希码
   handleHashCode(){
-    const code = this.state.hashCode;
+    const code = document.getElementById("hashCode").value;
+    this.setState({
+      hashCode: code,
+    })
     /*(async () => {
       const result = await evidenceContract.VerifyFiles.call({
         id: code,
@@ -119,9 +115,14 @@ class App extends Component {
         </Form>
 
           <div id = 'verify'>
-            <Input type = "textarea" id = "hashCode" onChange={this.inputHashCode}/>
-            <button onClick={()=>this.handleHashCode}>验证</button>
+        <Input type = "textarea" id = "hashCode"/>
+      </div>
+
+          <div>
+            <button onClick={()=>this.handleHashCode()}>验证</button>
           </div>
+
+
       </div>
     );
   }
