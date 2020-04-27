@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Reflection.Metadata.Ecma335;
+using System.Diagnostics.CodeAnalysis;
 using AElf.Types;
-using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 
 namespace AElf.Contracts.EvidenceContract
@@ -32,11 +31,15 @@ namespace AElf.Contracts.EvidenceContract
         {
             //fileReceived: id,fileName,fileBytes,fileSize,saveTime
             Hash id = input.Id;
-            var fileReveived = State.FileReceived[id];
-
-            fileReveived.FileName = input.FileName;
-            fileReveived.FileSize = input.FileSize;
-            fileReveived.SaveTime = Timestamp.FromDateTime(DateTime.Now);
+            var fileReveived = new FileReceived
+            {
+                Id = id,
+                FileByte = input.FileByte,
+                FileName = input.FileName,
+                FileSize = input.FileSize,
+                SaveTime = Timestamp.FromDateTime(DateTime.Now)
+            };
+            State.FileReceived[id] = fileReveived;
 
             return new Empty();
         }
