@@ -6,25 +6,23 @@ import { Input, Form, message, Button } from 'antd';
 import 'antd/dist/antd.css';
 import AElf from 'aelf-sdk';
 
-//端口号？
-/*
 const aelf = new AElf(new AElf.providers.HttpProvider('http://127.0.0.1:1235'));
-const newWallet = AElf.wallet.createNewWallet();
+const priviteKeyWallet = AElf.wallet.getWalletByPrivateKey('b842c00d26be7a38cf049ec381df1841199ea15ec3cc460b074a56e1a2d480ae');
 const evidenceContractName = 'AElf.ContractNames.EvidenceContract';
 
 let evidenceContractAddress;
 (async () => {
   const chainStatus = await aelf.chain.getChainStatus();
   const GenesisContractAddress = chainStatus.GenesisContractAddress;
-  const zeroContract = await aelf.chain.contractAt(GenesisContractAddress, newWallet);
+  const zeroContract = await aelf.chain.contractAt(GenesisContractAddress, priviteKeyWallet);
   evidenceContractAddress = await zeroContract.GetContractAddressByName.call(AElf.utils.sha256(evidenceContractName));
 })();
 
 let evidenceContract;
 (async () => {
-  evidenceContract = await aelf.chain.contractAt(evidenceContractAddress, newWallet)
+  evidenceContract = await aelf.chain.contractAt(evidenceContractAddress, priviteKeyWallet)
 })();
-*/
+
 
 class App extends Component {
   constructor(props) {
@@ -61,18 +59,16 @@ class App extends Component {
     const hashCode = AElf.utils.sha256(fileBytes);
     console.log(this.state.fileReceived);
     console.log("hash:"+hashCode);
-    /*(async () => {
-        await evidenceContract.FilesToHash.call({
+    (async () => {
+        await evidenceContract.FilesToHash({
         id: hashCode,
         fileName: this.state.filename,
-        fileByte: fileReceived,
-        fileSize: fileReceived.length,
+        fileByte: fileBytes,
+        fileSize: fileBytes.length,
         saveTime: new Date(),
       });
-      return (
-        <h1>hashCode</h1>
-      );
-    })();*/
+      alert(hashCode);
+    })();
 
   }
 
@@ -81,23 +77,22 @@ class App extends Component {
     const code = document.getElementById("hashCode").value;
     this.setState({
       hashCode: code,
-    })
-    /*(async () => {
+    });
+    (async () => {
       const result = await evidenceContract.VerifyFiles.call({
         id: code,
       });
       return (
         <h1>result</h1>
       );
-    })()*/
+    })()
 
   }
 
   render() {
-    // if(!aelf.isConnected()) {
-    //   alert('Blockchain Node is not running.');
-    //   process.exit(1);
-    // }
+     if(!aelf.isConnected()) {
+       alert('Blockchain Node is not running.');
+    }
 
     return (
       <div className="homepage">
