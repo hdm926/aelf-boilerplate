@@ -19,10 +19,6 @@ let evidenceContractAddress;
 })();
 
 let evidenceContract;
-(async () => {
-  evidenceContract = await aelf.chain.contractAt(evidenceContractAddress, priviteKeyWallet)
-})();
-
 
 class App extends Component {
   constructor(props) {
@@ -39,14 +35,12 @@ class App extends Component {
   }
 
   //选择上传的文件
-  inputFile(){
+   inputFile(){
     const fileReceived = document.querySelector('#input').files[0];
     const reader = new FileReader();
     reader.readAsArrayBuffer(fileReceived);
     const that = this;
     reader.onload = function () {
-      console.log(fileReceived.name);//文件名
-      console.log(this.result);
       that.setState({
         fileReceived : this.result,
         fileName : fileReceived.name,});
@@ -54,39 +48,42 @@ class App extends Component {
   }
 
   //提交选择的文件
-  handleSubmit() {
+  async handleSubmit() {
     const fileBytes = this.state.fileReceived;
     const hashCode = AElf.utils.sha256(fileBytes);
-    console.log(this.state.fileReceived);
-    console.log("hash:"+hashCode);
+    console.log("hashCode:"+hashCode);
+    console.log("fileName:"+this.state.filename);
+    console.log("fileByte:"+fileBytes);
+    console.log("fileSize:"+fileBytes.length);
+    evidenceContract = await aelf.chain.contractAt(evidenceContractAddress, priviteKeyWallet);
+    console.log(evidenceContract);
     (async () => {
-        await evidenceContract.FilesToHash({
+        let result = await evidenceContract.FilesToHash({
         id: hashCode,
         fileName: this.state.filename,
         fileByte: fileBytes,
         fileSize: fileBytes.length,
-        saveTime: new Date(),
       });
-      alert(hashCode);
+      alert(result);
     })();
 
   }
 
   //取得输入的哈希码
-  handleHashCode(){
-    const code = document.getElementById("hashCode").value;
+   async handleHashCode(){
+    const code = await document.getElementById("hashCode").value;
     this.setState({
       hashCode: code,
     });
-    (async () => {
-      const result = await evidenceContract.VerifyFiles.call({
-        id: code,
-      });
-      return (
-        <h1>result</h1>
-      );
-    })()
 
+    console.log("state:"+this.state.hashCode);
+    evidenceContract =  await aelf.chain.contractAt(evidenceContractAddress, priviteKeyWallet);
+    console.log(evidenceContract);
+
+    (async () => {
+      let result = await evidenceContract.VerifyFiles.call(this.state.hashCode);
+      console.log(result);
+    })();
   }
 
   render() {
