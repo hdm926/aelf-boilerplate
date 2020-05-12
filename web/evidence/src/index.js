@@ -6,6 +6,7 @@ import { Input, Form, message, Button } from 'antd';
 import 'antd/dist/antd.css';
 import AElf from 'aelf-sdk';
 
+
 const aelf = new AElf(new AElf.providers.HttpProvider('http://127.0.0.1:1235'));
 const priviteKeyWallet = AElf.wallet.getWalletByPrivateKey('b842c00d26be7a38cf049ec381df1841199ea15ec3cc460b074a56e1a2d480ae');
 const evidenceContractName = 'AElf.ContractNames.EvidenceContract';
@@ -25,7 +26,7 @@ class App extends Component {
     super(props);
     this.state = {
       fileReceived : [],
-      fileName : '',
+      fileName : '图片6',
       hashCode : '',
     }
     this.inputFile = this.inputFile.bind(this);
@@ -35,38 +36,34 @@ class App extends Component {
   }
 
   //选择上传的文件
-   inputFile(){
+  inputFile() {
     const fileReceived = document.querySelector('#input').files[0];
     const reader = new FileReader();
     reader.readAsArrayBuffer(fileReceived);
-    const that = this;
-    reader.onload = function () {
-      that.setState({
-        fileReceived : this.result,
-        fileName : fileReceived.name,});
+    reader.onload = async (event)=>{
+      const fileBuffer = event.target.result;
+      const hashCode = AElf.utils.sha256(fileBuffer);
+      const fileBytes = new Uint8Array(fileBuffer);
+      evidenceContract = await aelf.chain.contractAt(evidenceContractAddress, priviteKeyWallet);
+      (async () => {
+        let result = await evidenceContract.FilesToHash({
+          id: hashCode,
+          fileName: this.state.fileName,
+          fileByte: fileBytes,
+          fileSize: fileBytes.length,
+        });
+        console.log(result);
+      })();
     }
   }
 
   //提交选择的文件
-  async handleSubmit() {
-    const fileBytes = this.state.fileReceived;
-    const hashCode = AElf.utils.sha256(fileBytes);
-    console.log("hashCode:"+hashCode);
-    console.log("fileName:"+this.state.filename);
+    async handleSubmit(inputFile) {
+/*    console.log("hashCode:"+hashCode);
+    console.log("fileName:"+this.state.fileName);
     console.log("fileByte:"+fileBytes);
     console.log("fileSize:"+fileBytes.length);
-    evidenceContract = await aelf.chain.contractAt(evidenceContractAddress, priviteKeyWallet);
-    console.log(evidenceContract);
-    (async () => {
-        let result = await evidenceContract.FilesToHash({
-        id: hashCode,
-        fileName: this.state.filename,
-        fileByte: fileBytes,
-        fileSize: fileBytes.length,
-      });
-      alert(result);
-    })();
-
+    console.log(evidenceContract);*/
   }
 
   //取得输入的哈希码
