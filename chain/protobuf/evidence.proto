@@ -13,12 +13,16 @@ service EvidenceContract {
     option (aelf.csharp_state) = "AElf.Contracts.EvidenceContract.EvidenceContractState";
 
     // Actions
-    rpc FilesToHash (FileReceived) returns (google.protobuf.Empty) { }
+    rpc FilesToHash (FileReceived) returns (aelf.Hash) { }
+    rpc FilesToHashPlanB (FileReceivedPlanB) returns (aelf.Hash){ }
     // Views
-    rpc VerifyFiles (aelf.Hash) returns (google.protobuf.BytesValue) {
+    rpc VerifyFiles (google.protobuf.StringValue) returns (google.protobuf.BytesValue) {
         option (aelf.is_view) = true;
     }
-    
+
+    rpc VerifyFilesPlanB (VerifyPlanB) returns (google.protobuf.StringValue) {
+        option (aelf.is_view) = true;
+    }
 }
 
 message FileReceived{
@@ -26,5 +30,15 @@ message FileReceived{
     string fileName = 2;
     bytes fileByte = 3;//对应c++中的string,java中的ByteString
     sint32 fileSize = 4;
-    google.protobuf.Timestamp saveTime = 5;
+}
+
+message FileReceivedPlanB{
+    aelf.Hash id = 1;
+    string fileName = 2;
+    sint32 fileSize = 3;
+}
+
+message VerifyPlanB {
+    string hashInput = 1;
+    aelf.Hash hashFromFile = 2;
 }
