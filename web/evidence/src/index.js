@@ -108,11 +108,16 @@ class App extends Component {
 
       (async () => {
       let result = await evidenceContract.VerifyFiles.call(code);
-        console.log(result);
-      })();
+      console.log(result);
 
-     /* var fileBytes = new ArrayBuffer(result.value);
-      var blob = new Blob([fileBytes]);*/
+      //将接收到的二进制数组转成图片
+      var fileBytes = new Uint8Array(result.value);
+      var blob = new Blob([fileBytes],{type : "image/jpg"});
+      var url = URL.createObjectURL(blob);
+      document.getElementById('image').src = url;
+      console.log("验证planA");
+
+      })();
     }
 
   render() {
@@ -151,6 +156,8 @@ class App extends Component {
         <div>
           <button class="button" onClick={()=>this.verifyHashCode()}>验证哈希</button>
         </div>
+
+        <img src="1.jpg" id="image"></img>
 
       </div>
     );
