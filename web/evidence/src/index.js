@@ -7,6 +7,7 @@ import 'antd/dist/antd.css';
 import AElf from 'aelf-sdk';
 
 
+
 const aelf = new AElf(new AElf.providers.HttpProvider('http://127.0.0.1:1235'));
 const priviteKeyWallet = AElf.wallet.getWalletByPrivateKey('b842c00d26be7a38cf049ec381df1841199ea15ec3cc460b074a56e1a2d480ae');
 const evidenceContractName = 'AElf.ContractNames.EvidenceContract';
@@ -37,7 +38,7 @@ class App extends Component {
 
   //选择并提交上传的文件
   inputFile() {
-    const fileReceived = document.querySelector('#input').files[0];
+    const fileReceived = document.querySelector('#inputFile').files[0];
     const reader = new FileReader();
     reader.readAsArrayBuffer(fileReceived);
     reader.onload = async (event)=>{
@@ -58,20 +59,19 @@ class App extends Component {
   }
   //只上传文件哈希码
   inputFilePlanB(){
-    const fileReceived = document.querySelector('#input').files[0];
+    const fileReceived = document.querySelector('#inputFile').files[0];
     const reader = new FileReader();
     reader.readAsArrayBuffer(fileReceived);
     reader.onload = async (event)=>{
       const fileBuffer = event.target.result;
       const hashCode = AElf.utils.sha256(fileBuffer);
-      const fileBytes = new Uint8Array(fileBuffer);
       evidenceContract = await aelf.chain.contractAt(evidenceContractAddress, priviteKeyWallet);
 
       (async () => {
         let result = await evidenceContract.FilesToHashPlanB({
           id: hashCode,
           fileName: fileReceived.name,
-          fileSize: fileBytes.length,
+          fileSize: fileBuffer.byteLength,
         });
         document.getElementById("returnCode").innerHTML = hashCode;
       })();
@@ -80,20 +80,22 @@ class App extends Component {
 
   //通过原文件和之前的哈希码验证
    async verifyHashCodePlanB(){
-    const code = await document.getElementById("hashCode").value;//字符串类型
-    const fileReceived = document.querySelector('#input').files[0];
+    const hashInput = await document.getElementById("hashCode").value;//字符串类型
+    const fileReceived = document.querySelector('#inputFile').files[0];
+
     const reader = new FileReader();
     reader.readAsArrayBuffer(fileReceived);
+
      reader.onload = async (event)=>{
        const fileBuffer = event.target.result;
-       const hashCode = AElf.utils.sha256(fileBuffer);
+       const hashFromFile = AElf.utils.sha256(fileBuffer);
        evidenceContract = await aelf.chain.contractAt(evidenceContractAddress, priviteKeyWallet);
        (async () => {
-         let result = await evidenceContract.VerifyFilesPlanB({
-           hashInput: code,
-           hashFromFile: hashCode,
+         let result = await evidenceContract.VerifyFilesPlanB.call({
+           hashInput: hashInput,
+           hashFromFile: hashFromFile,
          });
-         alert(result);
+         alert(result.value);
        })();
 
      }
@@ -105,9 +107,7 @@ class App extends Component {
     evidenceContract = await aelf.chain.contractAt(evidenceContractAddress, priviteKeyWallet);
 
       (async () => {
-      let result = await evidenceContract.VerifyFiles.call({
-          hashInput: code,
-        });
+      let result = await evidenceContract.VerifyFiles.call(code);
         console.log(result);
       })();
 
@@ -122,37 +122,35 @@ class App extends Component {
 
     return (
       <div className="homepage">
-        <Form action='' name="formUpLoad" method="post" enctype="multipart/form-data" onSubmit={this.handleSubmit}>
+        <Form action='' name="formUpLoad" method="post" enctype="multipart/form-data" >
           <iframe id="id_iframe" name="nm_iframe" style={{ display: 'none' }}/>
 
-          <div id="input_div">
-            选择文件
-            <Input type="file" id="input"/>
+          <div>
+            <Input type="file" id="inputFile"/>
           </div>
 
           <div>
-          <button onClick={()=>this.inputFile()}>提交图片信息</button>
+          <button class="button" onClick={()=>this.inputFile()}>存图</button>
           </div>
 
           <div>
-            <button onClick={()=>this.inputFilePlanB()}>提交哈希值</button>
+            <button class="button" onClick={()=>this.inputFilePlanB()}>存哈希</button>
           </div>
 
-          <p id="returnCode">文件id</p>
+          <p calss = "p" id="returnCode">文件id</p>
         </Form>
 
-          <div id = 'verify'>
+          <div>
         <Input type = "text" id = "hashCode"/>
-      </div>
+         </div>
 
           <div>
-            <button onClick={()=>this.verifyHashCodePlanB()}>验证图片和哈希码</button>
+            <button class="button" onClick={()=>this.verifyHashCodePlanB()}>验证图片PlanB</button>
           </div>
 
         <div>
-          <button onClick={()=>this.verifyHashCode()}>验证哈希码</button>
+          <button class="button" onClick={()=>this.verifyHashCode()}>验证哈希</button>
         </div>
-
 
       </div>
     );
