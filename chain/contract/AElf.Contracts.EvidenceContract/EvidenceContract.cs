@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using AElf.Types;
+using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 
 namespace AElf.Contracts.EvidenceContract
 {
     public class EvidenceContract : EvidenceContractContainer.EvidenceContractBase
     {
-        public override BytesValue VerifyFiles(StringValue id)
+        public override BytesValue VerifyFiles(Hash id)
         {
-            Hash hashCode = Hash.FromString(id.Value);
-            var fileReceived = State.FileReceived[hashCode]; //得到原始文件
-            Assert(fileReceived==null,"The hash code input is wrong.");
-
-            if (fileReceived != null)
+            var fileReceived = State.FileReceived[id]; //得到原始文件
+           // Assert(fileReceived==null,"The hash code input is wrong.");
+           
+           if (fileReceived != null)
             {
                 var fileByte = fileReceived.FileByte;
                 return new BytesValue {Value = fileByte};
@@ -23,11 +23,13 @@ namespace AElf.Contracts.EvidenceContract
 
         public override StringValue VerifyFilesPlanB(VerifyPlanB verifyPlanB)
         {
-            var id = verifyPlanB.HashInput;
-            var hashInput = Hash.FromString(id);
-            var fileReceivedPlanB = State.FileReceivedPlanB[hashInput];
-            Assert(fileReceivedPlanB==null,"The hash code input is wrong.");
-            if (verifyPlanB.HashFromFile == hashInput)
+            var fileReceivedPlanB = State.FileReceivedPlanB[verifyPlanB.HashInput];
+            if (fileReceivedPlanB == null)
+            {
+                return new StringValue{Value = "文件标识码有误"};
+            }
+
+            if (verifyPlanB.HashInput.Equals(verifyPlanB.HashFromFile))
             {
                 return new StringValue{Value = "哈希一致"};
             }
