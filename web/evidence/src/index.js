@@ -6,8 +6,6 @@ import { Input, Form, message, Button } from 'antd';
 import 'antd/dist/antd.css';
 import AElf from 'aelf-sdk';
 
-
-
 const aelf = new AElf(new AElf.providers.HttpProvider('http://127.0.0.1:1235'));
 const priviteKeyWallet = AElf.wallet.getWalletByPrivateKey('b842c00d26be7a38cf049ec381df1841199ea15ec3cc460b074a56e1a2d480ae');
 const evidenceContractName = 'AElf.ContractNames.EvidenceContract';
@@ -36,7 +34,7 @@ class App extends Component {
     this.verifyHashCode = this.verifyHashCode.bind(this);
   }
 
-  //选择并提交上传的文件
+  //存证方案一：存图片内容
   inputFile() {
     const fileReceived = document.querySelector('#inputFile').files[0];
     const reader = new FileReader();
@@ -45,19 +43,26 @@ class App extends Component {
       const fileBuffer = event.target.result;
       const hashCode = AElf.utils.sha256(fileBuffer);
       const fileBytes = new Uint8Array(fileBuffer);
+      const blob = new Blob([fileBytes],{type : "image/jpg"});
+      document.getElementById("image").src = URL.createObjectURL(blob);
       evidenceContract = await aelf.chain.contractAt(evidenceContractAddress, priviteKeyWallet);
       (async () => {
         let result = await evidenceContract.FilesToHash({
           id: hashCode,
-          fileName: this.state.fileName,
+          fileName: fileReceived.name,
           fileByte: fileBytes,
           fileSize: fileBytes.length,
         });
         document.getElementById("returnCode").innerHTML = hashCode;
       })();
+      this.setState({
+        fileReceived :fileBytes,
+      });
+      console.log("存:"+fileBytes.length);
+      //console.log(typeof fileBytes);
     }
   }
-  //只上传文件哈希码
+  //存证方案二：只存文件哈希码
   inputFilePlanB(){
     const fileReceived = document.querySelector('#inputFile').files[0];
     const reader = new FileReader();
@@ -108,15 +113,10 @@ class App extends Component {
 
       (async () => {
       let result = await evidenceContract.VerifyFiles.call(code);
-      console.log(result);
+      let resultValue = result.value;
+      let src ="data:image/jpg;base64," + resultValue + " alt=";
 
-      //将接收到的二进制数组转成图片
-      var fileBytes = new Uint8Array(result.value);
-      var blob = new Blob([fileBytes],{type : "image/jpg"});
-      var url = URL.createObjectURL(blob);
-      document.getElementById('image').src = url;
-      console.log("验证planA");
-
+      document.getElementById('image').setAttribute('src', src);
       })();
     }
 
@@ -135,29 +135,29 @@ class App extends Component {
           </div>
 
           <div>
-          <button class="button" onClick={()=>this.inputFile()}>存图</button>
+          <button class="button1" onClick={()=>this.inputFile()}>存图</button>
           </div>
 
           <div>
-            <button class="button" onClick={()=>this.inputFilePlanB()}>存哈希</button>
+            <button class="button1" onClick={()=>this.inputFilePlanB()}>存哈希</button>
           </div>
 
-          <p calss = "p" id="returnCode">文件id</p>
+          <p id="returnCode">文件id：</p>
         </Form>
 
           <div>
-        <Input type = "text" id = "hashCode"/>
+        <Input type = "text" placeholder = "输入存证时返回的文件标识码" id = "hashCode"/>
          </div>
 
           <div>
-            <button class="button" onClick={()=>this.verifyHashCodePlanB()}>验证图片PlanB</button>
+            <button id = "button2" onClick={()=>this.verifyHashCodePlanB()}>验图与哈希</button>
           </div>
 
         <div>
-          <button class="button" onClick={()=>this.verifyHashCode()}>验证哈希</button>
+          <button id = "button3" onClick={()=>this.verifyHashCode()}>验哈希</button>
         </div>
 
-        <img src="1.jpg" id="image"></img>
+        <img id="image"/>
 
       </div>
     );

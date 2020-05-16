@@ -12,7 +12,23 @@ code {
     monospace;
 }
 
-.button {
+.button1 {
+  background-color: #555555;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  width: 150px;
+  height: 50px;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  float: left;
+
+}
+#button2{
   background-color: #555555;
   border: none;
   color: white;
@@ -24,12 +40,53 @@ code {
   margin: 4px 2px;
   cursor: pointer;
   float: left;
-}
-.p{
-  font-weight: bold;
-  font-size: 24px;
+  width: 150px;
+  height: 50px;
   position: absolute;
-  left:100px;
+  left:0px;
+  top:190px;
+}
+#button3{
+  background-color: #555555;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  float: left;
+  width: 150px;
+  height: 50px;
+  position: absolute;
+  left:155px;
+  top:190px;
+}
+
+#inputFile{/*文件选择器*/
+  width: 600px;
+}
+
+#returnCode{/*存证时返回的文件标识码*/
+  font-weight: bold;
+  font-size: 20px;
+  position: absolute;
+  left:0px;
+  top:100px;
+}
+
+#hashCode{/*输入的哈希码*/
+  position: absolute;
+  left:0px;
   top:150px;
+  width: 600px;
+}
+
+#image{
+  position: absolute;
+  left:0px;
+  top:250px;
 
 }
