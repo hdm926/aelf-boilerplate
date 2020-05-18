@@ -83,7 +83,7 @@ class App extends Component {
     }
   }
 
-  //通过原文件和之前的哈希码验证
+  //验证方案二：通过原文件和之前的哈希码验证
    async verifyHashCodePlanB(){
     const hashInput = await document.getElementById("hashCode").value;//字符串类型
     const fileReceived = document.querySelector('#inputFile').files[0];
@@ -106,17 +106,22 @@ class App extends Component {
      }
   }
 
-  //通过哈希码验证，并返回原文件
+  //验证方案一：通过哈希码验证，并返回原文件
   async verifyHashCode(){
     const code =  document.getElementById("hashCode").value;
     evidenceContract = await aelf.chain.contractAt(evidenceContractAddress, priviteKeyWallet);
 
       (async () => {
       let result = await evidenceContract.VerifyFiles.call(code);
-      let resultValue = result.value;
-      let src ="data:image/jpg;base64," + resultValue + " alt=";
+      if(result!=null){
+        let resultValue = result.value;
+        let src ="data:image/jpg;base64," + resultValue + " alt=";
+        document.getElementById('image').setAttribute('src', src);
+      }
+      else{
+        alert("文件标识码有误！")
+      }
 
-      document.getElementById('image').setAttribute('src', src);
       })();
     }
 
