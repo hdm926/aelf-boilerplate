@@ -29,7 +29,7 @@ namespace AElf.Contracts.EvidenceContract
                 return new StringValue{Value = "文件标识码有误"};
             }
 
-            if (verifyPlanB.HashInput.Equals(verifyPlanB.HashFromFile))
+            if (fileReceivedPlanB.Id.Equals(verifyPlanB.HashFromFile))
             {
                 return new StringValue{Value = "哈希一致"};
             }
