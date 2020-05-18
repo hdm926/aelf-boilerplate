@@ -16,7 +16,7 @@ service EvidenceContract {
     rpc FilesToHash (FileReceived) returns (aelf.Hash) { }
     rpc FilesToHashPlanB (FileReceivedPlanB) returns (aelf.Hash){ }
     // Views
-    rpc VerifyFiles (google.protobuf.StringValue) returns (google.protobuf.BytesValue) {
+    rpc VerifyFiles (aelf.Hash) returns (google.protobuf.BytesValue) {
         option (aelf.is_view) = true;
     }
 
@@ -39,6 +39,6 @@ message FileReceivedPlanB{
 }
 
 message VerifyPlanB {
-    string hashInput = 1;
+    aelf.Hash hashInput = 1;
     aelf.Hash hashFromFile = 2;
 }
