@@ -28,6 +28,34 @@ code {
   float: left;
 
 }
+
+#inputFile{/*文件选择器*/
+  width: 600px;
+}
+
+
+#returnCode{/*存证时返回的文件标识码*/
+  font-weight: bold;
+  font-size: 20px;
+  position: absolute;
+  left:0px;
+  top:100px;
+}
+
+#inputFile2{/*文件选择器*/
+  width: 600px;
+  position: absolute;
+  left: 0px;
+  top:160px;
+}
+
+#hashCode{/*输入的哈希码*/
+  position: absolute;
+  left:0px;
+  top:210px;
+  width: 600px;
+}
+
 #button2{
   background-color: #555555;
   border: none;
@@ -44,7 +72,7 @@ code {
   height: 50px;
   position: absolute;
   left:0px;
-  top:190px;
+  top:260px;
 }
 #button3{
   background-color: #555555;
@@ -62,31 +90,12 @@ code {
   height: 50px;
   position: absolute;
   left:155px;
-  top:190px;
-}
-
-#inputFile{/*文件选择器*/
-  width: 600px;
-}
-
-#returnCode{/*存证时返回的文件标识码*/
-  font-weight: bold;
-  font-size: 20px;
-  position: absolute;
-  left:0px;
-  top:100px;
-}
-
-#hashCode{/*输入的哈希码*/
-  position: absolute;
-  left:0px;
-  top:150px;
-  width: 600px;
+  top:260px;
 }
 
 #image{
   position: absolute;
   left:0px;
-  top:250px;
+  top:350px;
 
 }

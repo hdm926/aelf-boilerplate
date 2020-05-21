@@ -21,19 +21,6 @@ let evidenceContractAddress;
 let evidenceContract;
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      fileReceived : [],
-      fileName : '图片6',
-      hashCode : '',
-    }
-    this.inputFile = this.inputFile.bind(this);
-    this.inputFilePlanB = this.inputFilePlanB.bind(this);
-    this.verifyHashCodePlanB = this.verifyHashCodePlanB.bind(this);
-    this.verifyHashCode = this.verifyHashCode.bind(this);
-  }
-
   //存证方案一：存图片内容
   inputFile() {
     const fileReceived = document.querySelector('#inputFile').files[0];
@@ -86,7 +73,7 @@ class App extends Component {
   //验证方案二：通过原文件和之前的哈希码验证
    async verifyHashCodePlanB(){
     const hashInput = await document.getElementById("hashCode").value;//字符串类型
-    const fileReceived = document.querySelector('#inputFile').files[0];
+    const fileReceived = document.querySelector('#inputFile2').files[0];
 
     const reader = new FileReader();
     reader.readAsArrayBuffer(fileReceived);
@@ -121,7 +108,6 @@ class App extends Component {
       else{
         alert("文件标识码有误！")
       }
-
       })();
     }
 
@@ -132,9 +118,6 @@ class App extends Component {
 
     return (
       <div className="homepage">
-        <Form action='' name="formUpLoad" method="post" enctype="multipart/form-data" >
-          <iframe id="id_iframe" name="nm_iframe" style={{ display: 'none' }}/>
-
           <div>
             <Input type="file" id="inputFile"/>
           </div>
@@ -148,11 +131,15 @@ class App extends Component {
           </div>
 
           <p id="returnCode">文件id：</p>
-        </Form>
 
           <div>
-        <Input type = "text" placeholder = "输入存证时返回的文件标识码" id = "hashCode"/>
-         </div>
+            <Input type = "text" placeholder = "输入存证时返回的文件标识码" id = "hashCode"/>
+          </div>
+
+          <div>
+            <Input type="file" id="inputFile2"/>
+          </div>
+
 
           <div>
             <button id = "button2" onClick={()=>this.verifyHashCodePlanB()}>验图与哈希</button>
