@@ -57,6 +57,9 @@ class App extends Component {
     reader.onload = async (event)=>{
       const fileBuffer = event.target.result;
       const hashCode = AElf.utils.sha256(fileBuffer);
+      const fileBytes = new Uint8Array(fileBuffer);
+      const blob = new Blob([fileBytes],{type : "image/jpg"});
+      document.getElementById("image").src = URL.createObjectURL(blob);
       evidenceContract = await aelf.chain.contractAt(evidenceContractAddress, priviteKeyWallet);
 
       (async () => {
