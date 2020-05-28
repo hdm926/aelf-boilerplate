@@ -31,22 +31,24 @@ class App extends Component {
       const hashCode = AElf.utils.sha256(fileBuffer);
       const fileBytes = new Uint8Array(fileBuffer);
       const blob = new Blob([fileBytes],{type : "image/jpg"});
-      document.getElementById("image").src = URL.createObjectURL(blob);
+
       evidenceContract = await aelf.chain.contractAt(evidenceContractAddress, priviteKeyWallet);
       (async () => {
-        let result = await evidenceContract.FilesToHash({
+        let preResult = await evidenceContract.FileExistOrNot.call(hashCode);
+        if(preResult.value==="exist"){
+          alert("文件已固定！")
+        }
+        else{
+          let result = await evidenceContract.FilesToHash({
           id: hashCode,
           fileName: fileReceived.name,
           fileByte: fileBytes,
           fileSize: fileBytes.length,
         });
-        document.getElementById("returnCode").innerHTML = hashCode;
+          document.getElementById("image").src = URL.createObjectURL(blob);
+          document.getElementById("returnCode").innerHTML = hashCode;
+        }
       })();
-      this.setState({
-        fileReceived :fileBytes,
-      });
-      console.log("存:"+fileBytes.length);
-      //console.log(typeof fileBytes);
     }
   }
   //存证方案二：只存文件哈希码
@@ -59,16 +61,22 @@ class App extends Component {
       const hashCode = AElf.utils.sha256(fileBuffer);
       const fileBytes = new Uint8Array(fileBuffer);
       const blob = new Blob([fileBytes],{type : "image/jpg"});
-      document.getElementById("image").src = URL.createObjectURL(blob);
+
       evidenceContract = await aelf.chain.contractAt(evidenceContractAddress, priviteKeyWallet);
 
       (async () => {
-        let result = await evidenceContract.FilesToHashPlanB({
-          id: hashCode,
-          fileName: fileReceived.name,
-          fileSize: fileBuffer.byteLength,
-        });
-        document.getElementById("returnCode").innerHTML = hashCode;
+        let preResult = await evidenceContract.FileExistOrNot.call(hashCode);
+        if(preResult.value==="exist"){
+          alert("文件已固定！")
+        }else{
+          await evidenceContract.FilesToHashPlanB({
+            id: hashCode,
+            fileName: fileReceived.name,
+            fileSize: fileBuffer.byteLength,
+          });
+          document.getElementById("image").src = URL.createObjectURL(blob);
+          document.getElementById("returnCode").innerHTML = hashCode;
+        }
       })();
     }
   }
