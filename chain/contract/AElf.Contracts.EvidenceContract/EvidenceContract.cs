@@ -8,6 +8,7 @@ namespace AElf.Contracts.EvidenceContract
 {
     public class EvidenceContract : EvidenceContractContainer.EvidenceContractBase
     {
+        //验证方案一
         public override BytesValue VerifyFiles(Hash id)
         {
             var fileReceived = State.FileReceived[id]; //得到原始文件
@@ -21,6 +22,7 @@ namespace AElf.Contracts.EvidenceContract
             return null;
         }
 
+        //验证方案二
         public override StringValue VerifyFilesPlanB(VerifyPlanB verifyPlanB)
         {
             var fileReceivedPlanB = State.FileReceivedPlanB[verifyPlanB.HashInput];
@@ -39,11 +41,13 @@ namespace AElf.Contracts.EvidenceContract
             }
             
         }
-
+        
+        //存证方案一：存储图片信息，系统压力较大
         public override Hash FilesToHash(FileReceived input)
-        {//存储图片信息的接口，系统压力较大
+        {
             //fileReceived: id,fileName,fileBytes,fileSize,saveTime
             Hash id = input.Id;
+
             var fileReveived = new FileReceived
             {
                 Id = id,
@@ -55,9 +59,10 @@ namespace AElf.Contracts.EvidenceContract
 
             return id;
         }
-
+        
+        //存证方案二，只存哈希
         public override Hash FilesToHashPlanB(FileReceivedPlanB input)
-        {//只存储图片哈希值的接口
+        {
             Hash id = input.Id;
             var fileReveivedPlanB = new FileReceivedPlanB
             {
@@ -67,6 +72,21 @@ namespace AElf.Contracts.EvidenceContract
             };
             State.FileReceivedPlanB[id] = fileReveivedPlanB;
             return id;
+        }
+        
+        //查询文件是否存在
+        public override StringValue FileExistOrNot(Hash input)
+        {
+            var file1 = State.FileReceived[input];
+            var file2 = State.FileReceivedPlanB[input];
+            if (file1 == null & file2 == null)
+            {
+                return new StringValue{Value = "not exist"};
+            }
+            else
+            {
+                return new StringValue{Value = "exist"};
+            }
         }
     }
 }

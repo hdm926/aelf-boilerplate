@@ -15,6 +15,7 @@ service EvidenceContract {
     // Actions
     rpc FilesToHash (FileReceived) returns (aelf.Hash) { }
     rpc FilesToHashPlanB (FileReceivedPlanB) returns (aelf.Hash){ }
+    rpc FileExistOrNot(aelf.Hash) returns (google.protobuf.StringValue){}
     // Views
     rpc VerifyFiles (aelf.Hash) returns (google.protobuf.BytesValue) {
         option (aelf.is_view) = true;
