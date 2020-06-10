@@ -5,13 +5,13 @@ import "aelf/core.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
-
+import "acs1.proto";
 
 option csharp_namespace = "AElf.Contracts.EvidenceContract";
 
 service EvidenceContract {
     option (aelf.csharp_state) = "AElf.Contracts.EvidenceContract.EvidenceContractState";
-
+    option (aelf.base) = "acs1.proto";
     // Actions
     rpc FilesToHash (FileReceived) returns (aelf.Hash) { }
     rpc FilesToHashPlanB (FileReceivedPlanB) returns (aelf.Hash){ }

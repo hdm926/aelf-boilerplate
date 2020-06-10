@@ -1,7 +1,5 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using Acs1;
 using AElf.Types;
-using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 
 namespace AElf.Contracts.EvidenceContract
@@ -87,6 +85,48 @@ namespace AElf.Contracts.EvidenceContract
             {
                 return new StringValue{Value = "exist"};
             }
+        }
+        
+        //交易扣费
+        public override MethodFees GetMethodFee(StringValue input)
+        {
+            string MethodName = input.Value;
+            if (MethodName == "FilesToHash")
+            {
+                return new MethodFees
+                {
+                    MethodName = input.Value, 
+                    Fees =
+                    {
+                        new MethodFee
+                        {
+                            Symbol = "ELF", 
+                            BasicFee = 20_00000000
+                        }
+                    }
+                };
+            }
+
+            if (MethodName == "FilesToHashPlanB")
+            {
+                return new MethodFees
+                {
+                    MethodName = input.Value, 
+                    Fees =
+                    {
+                        new MethodFee
+                        {
+                            Symbol = "ELF",
+                            BasicFee = 10_00000000
+                        }
+                    }
+                };
+            }
+            else
+            {
+                return new MethodFees();
+            }
+            //return new MethodFees();
         }
     }
 }

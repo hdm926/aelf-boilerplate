@@ -15,7 +15,7 @@ namespace AElf.Contracts.EvidenceContract
             var txResult = await EvidenceContractStub.FilesToHash.SendAsync(new FileReceived());
             txResult.TransactionResult.Status.ShouldBe(TransactionResultStatus.Mined);
             var text = new Empty();
-            text.MergeFrom(txResult.TransactionResult.ReturnValue);
+            text.MergeFrom((Empty) txResult.TransactionResult.ReturnValue);
             text.ShouldNotBeNull();
         }
         
@@ -25,7 +25,7 @@ namespace AElf.Contracts.EvidenceContract
             var txResult = await EvidenceContractStub.VerifyFiles.SendAsync(new Hash());
             txResult.TransactionResult.Status.ShouldBe(TransactionResultStatus.Mined);
             var text = new BytesValue();
-            text.MergeFrom(txResult.TransactionResult.ReturnValue);
+            text.MergeFrom((BytesValue) txResult.TransactionResult.ReturnValue);
             text.ShouldNotBeNull();
         }
     }
